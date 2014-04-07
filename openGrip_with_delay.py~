@@ -1,6 +1,0 @@
-import rospy
-import baxter_interface
-
-left = baxter_interface.Gripper('left')
-rospy.sleep(10)
-left.open(80)
