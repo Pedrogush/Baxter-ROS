@@ -1,6 +1,7 @@
 import mk_sense
 
 # NOW WITH PROPER IMPLEMENTATIONS, PURPOSE IS TO TAKE A SET OF .feel FILES AND CREATE A MUCH LARGER SET OF .impr FILES FROM THE COMPARISON BETWEEN EACH 2 INDIVIDUAL .feel FILES
+# Needs to be looked at, comparison looks wobly at best, maybe just a question of having the list shift back one position
 EReader = [0]*30
 a=0
 b=0
