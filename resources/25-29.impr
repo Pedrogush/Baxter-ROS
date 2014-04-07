@@ -1,5 +1,6 @@
 The lowest recorded torque for each joint in file 25.feel is: M 
 0.0M
+0.0M
 10.672M
 12.516M
 0.0M
@@ -14,8 +15,8 @@ The lowest recorded torque for each joint in file 25.feel is: M
 0.132M
 0.12400000000000001M
 0.0M
-20.479999999999997M
 The highest recorded torque for each joint in file 25.feel is: M 
+0M
 0M
 11.48M
 12.604M
@@ -31,7 +32,6 @@ The highest recorded torque for each joint in file 25.feel is: M
 0.17200000000000001M
 0.22000000000000003M
 0.05600000000000001M
-20.479999999999997M
 The mean torque for each joint in file 25.feel is: M 
 0M
 0.0M

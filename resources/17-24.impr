@@ -1,5 +1,6 @@
 The lowest recorded torque for each joint in file 17.feel is: M 
 0.0M
+0.0M
 10.607999999999999M
 12.516M
 0.0M
@@ -14,8 +15,8 @@ The lowest recorded torque for each joint in file 17.feel is: M
 0.0M
 0.11600000000000002M
 0.0M
-20.479999999999997M
 The highest recorded torque for each joint in file 17.feel is: M 
+0M
 0M
 11.48M
 12.604M
@@ -31,7 +32,6 @@ The highest recorded torque for each joint in file 17.feel is: M
 0.264M
 0.22000000000000003M
 0.05600000000000001M
-20.479999999999997M
 The mean torque for each joint in file 17.feel is: M 
 0M
 0.0M
