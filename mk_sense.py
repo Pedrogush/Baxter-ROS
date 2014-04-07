@@ -124,32 +124,32 @@ class effort_reader(object):
 # NEEDS HEAVY CLEANUP
 
 	def print_mean_effort_per_joint(self, a, impression_taker):
-		impression_taker.S.write('The mean torque for each joint in file %s.feel is: M \n' %a)
+		impression_taker.S.write('The mean torque for each joint in file %s.feel is: uM \n' %a)
 		while self.i < 16:
 		      print self.Harm_NR[self.i]
                       print '\n'
 		      impression_taker.S.write(repr(self.Harm_NR[self.i]))
-		      impression_taker.S.write('M\n')
+		      impression_taker.S.write('uM')
                       self.i = self.i+1
                 self.i = 0
 
 # This looks good for now...
 	def print_lowest_recorded_torque(self, a, impression_taker):	
-		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: M \n' %a)
+		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: uM \n' %a)
 		while self.i <16:
 		      print self.Harm_NLest[self.i]
                       print '\n'
 		      impression_taker.S.write(repr(self.Harm_NLest[self.i]))
-		      impression_taker.S.write('M\n')
+		      impression_taker.S.write('uM')
 		      self.i = self.i+1
 		self.i = 0
 	def print_highest_recorded_torque(self,a, impression_taker):
-		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: M \n' %a)
+		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: uM \n' %a)
 		while self.i <16:
 		      print self.Harm_NHest[self.i]
                       print '\n'
 		      impression_taker.S.write(repr(self.Harm_NHest[self.i]))
-		      impression_taker.S.write('M\n')
+		      impression_taker.S.write('uM')
 		      self.i = self.i+1
 		self.i = 0
 
@@ -163,31 +163,31 @@ class effort_reader(object):
 
 # Print difference AND clear the object's memory about that specific comparison
 	def print_difference_between_mean_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the mean torques in file 1 and file 2 is: M\n')
+		impression_taker.S.write('The difference between the mean torques in file 1 and file 2 is: uM\n')
 		while self.i<16:  
 		      print self.Harm_N1[self.i]
 		      impression_taker.S.write(repr(self.Harm_N1[self.i]))
-		      impression_taker.S.write('M\n')
+		      impression_taker.S.write('uM')
 		      self.i = self.i+1
                       print '\n'
 		self.i=0
                 print '\n'
 	def print_difference_between_lowest_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the lowest recorded torques in file 1 and file 2 is: M\n')
+		impression_taker.S.write('The difference between the lowest recorded torques in file 1 and file 2 is: uM\n')
 		while self.i<16: 
 	              print self.Harm_NLest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NLest1[self.i]))
-                      impression_taker.S.write('M\n')
+                      impression_taker.S.write('uM')
 		      self.i = self.i+1
                       print '\n'
 		self.i=0
                 print '\n'
 	def print_difference_between_highest_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the highest recorded torques in file 1 and file 2 is: M\n')
+		impression_taker.S.write('The difference between the highest recorded torques in file 1 and file 2 is: uM\n')
 		while self.i<16:      
 		      print self.Harm_NHest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NHest1[self.i]))
-	              impression_taker.S.write('M\n')
+	              impression_taker.S.write('uM')
 		      self.i = self.i+1
                       print '\n'
 		self.i=0
