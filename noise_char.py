@@ -59,7 +59,7 @@ class noise_canceller(object):
 		       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] + self.decimals*self.c
 		       self.decimals = self.decimals*0.1; self.numbercount = self.numbercount+1
 	            except ValueError:
-		       self.decimals = 1
+		       self.decimals = self.decimals
 		    if string == 'e':
 		       self.iEMode = 1
 	            if string == '.' and self.numbercount>1:
@@ -152,7 +152,7 @@ def main():
 	NC.readmatrix()
 # [4] not N_num and not self set
 #	print NC.allocationmax
-	print NC.Highs
+	print NC.MeansV
 
 #
 if __name__ == "__main__":
