@@ -137,20 +137,20 @@ class effort_reader(object):
 	def print_lowest_recorded_torque(self, a, impression_taker):	
 		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: M \n' %a)
 		while self.i <16:
-		      self.i = self.i+1
 		      print self.Harm_NLest[self.i]
                       print '\n'
 		      impression_taker.S.write(repr(self.Harm_NLest[self.i]))
 		      impression_taker.S.write('M\n')
+		      self.i = self.i+1
 		self.i = 0
 	def print_highest_recorded_torque(self,a, impression_taker):
 		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: M \n' %a)
 		while self.i <16:
-		      self.i = self.i+1
 		      print self.Harm_NHest[self.i]
                       print '\n'
 		      impression_taker.S.write(repr(self.Harm_NHest[self.i]))
 		      impression_taker.S.write('M\n')
+		      self.i = self.i+1
 		self.i = 0
 
 	def get_differences_in_torque(self , effort_reader2):
