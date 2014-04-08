@@ -26,6 +26,9 @@ class effort_reader(object):
 		self.allocation = 0
 		self.x=0
                 self.i=0
+		self.inverter = 1
+		self.interpretV=0
+		self.iEMode = 0
 	def clear(self):
 		self.numbercount = 0
 		self.decimals = 1
@@ -41,12 +44,19 @@ class effort_reader(object):
                 self.Ef1 = [0]*self.allocation
 		self.i=0
         def interpret(self, string):
+	 if self.iEMode==0:
+	    if string =='e':
+	       self.iEMode=1
+	    if string =='-':
+	       self.inverter = -self.inverter
             if string == '(':
                startline=1
 	    if string == ',':
 	       self.decimals = 1
 	       self.numberpass = 1
+               self.Ef1[self.N_num] = self.Ef1[self.N_num] *self.inverter
 	       self.N_num = self.N_num + 1
+ 	       self.inverter = 1 
 	    if string == '0':
 	       self.c = float(string)
 	       self.Ef1[self.N_num] = self.Ef1[self.N_num] + self.decimals*self.c
@@ -102,7 +112,19 @@ class effort_reader(object):
 	    if string == ' ':
 	     self.numbercount = 0
 	    if string == ')':
+	     self.Ef1[self.N_num] = self.Ef1[self.N_num] *self.inverter
 	     self.N_num = self.N_num + 1
+	     self.inverter = 1 
+	 if self.iEMode==1:
+	     try:
+		self.interpretV = int(string)
+	     except ValueError:
+		self.interpretV = self.interpretV
+	     if self.interpretV > 0:
+		for i in range(self.interpretV):
+ 	           self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]]/10 
+	        self.iEMode = 0; self.interpretV = 0
+
 # run get least and maximum effort before getting mean effort, CODE NEEDS HEAVY CLEANUP
 	def calc_values_per_joint(self):
 		while self.i<self.N_num:
