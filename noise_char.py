@@ -20,11 +20,14 @@ class noise_canceller(object):
 		self.Means = [[[0 for i in range(17)] for j in range(a)] for k in range(b)]
 		self.Highs = [[[0 for i in range(17)] for j in range(a)] for k in range(b)]
 		self.Lows = [[[100 for i in range(17)] for j in range(a)] for k in range(b)]
-		self.MeansV = [0]*17; self.MeanDiffDen = [0]*17; self.MeanDiff = [0]*17; self.HighDiff = [0]*17
-		self.LowDiff = [0]*17; self.Ef1 = []; self.Ef1_listLoc = [[0 for j in range(a)] for k in range(b)]
+		self.MeansV = [0]*17; self.MeanDiffDen = [0]*17; self.HighDiffDen = [0]*17;
+                self.LowDiffDen = [0]*17; self.MeanDiff = [0]*17; self.HighDiff = [0]*17
+		self.LowDiff = [0]*17; self.MeanHigh = [0]*17; self.MeanLow = [100]*17; 
+		self.HighHigh = [0]*17; self.HighLow = [100]*17; self.LowHigh = [0]*17; self.LowLow = [100]*17;
+                self.Ef1 = []; self.Ef1_listLoc = [[0 for j in range(a)] for k in range(b)]
 		self.numbercount = 0; self.decimals = 1; self.N_num = [[0 for i in range(a)] for j in range(b)]
                 self.set = [[0 for i in range(a)] for j in range(b)]; self.allocation = [[0 for i in range(a)] for j in range(b)]
-		self.allocationmax = 0; self.i=0
+		self.allocationmax = 0; self.i=0; self.inverter = 1;
 		self.yetanothervariable = 0; self.precedingstring = 0; self.l=-1; self.iEMode = 0; self.interpretV = 0
 
 
@@ -50,11 +53,13 @@ class noise_canceller(object):
                self.set[na][nb]=self.set[na][nb] + 1
 	    if self.set[na][nb]>3:
 		if self.set[na][nb]<7 and self.iEMode == 0:
+	            if string == '-':
+		       self.inverter = -self.inverter
 		    if string == 'u' and self.precedingstring != ':':
-		       self.decimals = 1; self.numberpass = 1; self.N_num[na][nb] = self.N_num[na][nb] + 1; self.numbercount = 0
+		       self.decimals = 1; self.numberpass = 1; self.N_num[na][nb] = self.N_num[na][nb] + 1; self.numbercount = 0; 			       self.inverter=1
 	     	    try:
 		       self.c = int(string)
-		       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] + self.decimals*self.c
+		       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = (self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] + self.decimals*self.c)*self.inverter
 		       self.decimals = self.decimals*0.1; self.numbercount = 2
 	            except ValueError:
 		       self.decimals = self.decimals
@@ -85,8 +90,8 @@ class noise_canceller(object):
 		  except ValueError:
 		      self.precedingstring = self.precedingstring
 		  self.interpret(self.V[a][b][self.i], a, b)
-		  
 		  self.i = self.i+1
+		self.inverter = 1;
 	        self.decimals = 1; self.N_num[a][b] = 0; self.numbercount = 0 
 		self.yetanothervariable = 0; self.set[a][b]=0; self.i=0
 # highest variation in difference between two files in file matrix
@@ -95,7 +100,6 @@ class noise_canceller(object):
 # mean variation in difference between highest values in files in file matrix
 # mean variation in difference between lowest values in files in file matrix
 
-# COMPLETELY WRONG< REDO!
 	def load_variables(self):
 		while self.atB< self.b:
 			while self.atA< self.a:
@@ -116,38 +120,39 @@ class noise_canceller(object):
 		for i in range(17):
 			listA[i] = listA[i] + listB[i]
 			listAcumulator[i] = listAcumulator[i] + 1
-	def get_mean(listA, listAcumulator):
+	def get_mean(self, listA, listAcumulator):
 		for i in range(17):
 			listA[i] = listA[i]/listAcumulator[i]
 
-	def sorthigh(listA, listB):
+	def sorthigh(self, listA, listB):
 		for i in range(17):
 			if listA[i]<listB[i]:
 				listA[i] = listB[i]
 
-	def sortlow(listA,listB):
+	def sortlow(self, listA,listB):
 		for i in range(17):
 			if listA[i]>listB[i]:
 				listA[i] = listB[i]	
-
+# Highs receives all the high difference variables, means receives all mean difference and lows receives all low difference, we then #proceed to sort those into the mean high differece, low high difference and high high difference and so on, this creates 9 sets of #variables for us to work with, we should now take the mean values across all .feel files and use them as a baseline to characterize #our 'torque resolution' 
 	def treat_variables(self):
 		while self.atB<self.b:
 			while self.atA<self.a:
 				if self.atA>self.atB:
-					while self.i<17:
-						self.MeanDiff[self.i] = self.MeanDiff[self.i] + self.Means[self.atB][self.atA][self.i]
-						self.MeanDiffDen[self.i] = self.MeanDiffDen[self.i] + 1
-						self.HighDiff[self.i] = self.HighDiff[self.i]+self.Highs[self.atB][self.atA][self.i]
-						if self.LowDiff[self.i] < self.Lows[self.atB][self.atA][self.i]:
-							self.LowDiff[self.i] = self.Lows[self.atB][self.atA][self.i]
-						self.i = self.i +1
-					self.i = 0
+						self.acum_mean(self.MeanDiff, self.Means[self.atB][self.atA], self.MeanDiffDen)
+						self.acum_mean(self.HighDiff, self.Highs[self.atB][self.atA], self.HighDiffDen)
+						self.acum_mean(self.LowDiff, self.Lows[self.atB][self.atA], self.LowDiffDen)
+						self.sorthigh(self.MeanHigh, self.Means[self.atB][self.atA])
+						self.sorthigh(self.HighHigh, self.Highs[self.atB][self.atA])
+						self.sorthigh(self.LowHigh, self.Lows[self.atB][self.atA])
+						self.sortlow(self.MeanLow, self.Means[self.atB][self.atA])
+						self.sortlow(self.HighLow, self.Highs[self.atB][self.atA])
+						self.sortlow(self.LowLow, self.Lows[self.atB][self.atA])
 				self.atA = self.atA+1
 			self.atA=0; self.atB = self.atB+1
 		self.atB = 0
-		while self.i < 17:
-			self.MeansV[self.i] = self.MeanDiff[self.i]/self.MeanDiffDen[self.i]
-			self.i = self.i+1
+		self.get_mean(self.MeanDiff, self.MeanDiffDen)
+		self.get_mean(self.HighDiff, self.HighDiffDen)
+		self.get_mean(self.LowDiff, self.LowDiffDen)
 		self.i=0
 
 	def readmatrix(self):
@@ -168,7 +173,8 @@ def main():
 	NC.readmatrix()
 # [4] not N_num and not self set
 #	print NC.allocationmax
-	print NC.HighDiff
+	print NC.MeanDiff
+	
 #
 if __name__ == "__main__":
     main()
