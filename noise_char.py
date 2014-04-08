@@ -27,7 +27,7 @@ class noise_canceller(object):
                 self.Ef1 = []; self.Ef1_listLoc = [[0 for j in range(a)] for k in range(b)]
 		self.numbercount = 0; self.decimals = 1; self.N_num = [[0 for i in range(a)] for j in range(b)]
                 self.set = [[0 for i in range(a)] for j in range(b)]; self.allocation = [[0 for i in range(a)] for j in range(b)]
-		self.allocationmax = 0; self.i=0; self.inverter = 1;
+		self.allocationmax = 0; self.i=0; self.inverter = [[1 for i in range(a)] for j in range(b)];
 		self.yetanothervariable = 0; self.precedingstring = 0; self.l=-1; self.iEMode = 0; self.interpretV = 0
 
 
@@ -40,9 +40,9 @@ class noise_canceller(object):
 						self.i = self.i+1
 						if self.V[self.atA][self.atB][self.i]== 'M' and self.V[self.atA][self.atB][self.i-1] == 'u':
 							self.allocation[self.atA][self.atB] = self.allocation[self.atA][self.atB] + 1
-					self.Ef1_listLoc[self.atA][self.atB] = self.l 
-					self.l = self.l+1 		
+					self.Ef1_listLoc[self.atA][self.atB] = self.l 		
 					self.Ef1.append([0 for m in range(self.allocation[self.atA][self.atB])])
+					self.l = self.l+1 
 				self.i=0									
 			self.atA= self.atA+1
 			self.atB=0
@@ -54,17 +54,19 @@ class noise_canceller(object):
 	    if self.set[na][nb]>3:
 		if self.set[na][nb]<7 and self.iEMode == 0:
 	            if string == '-':
-		       self.inverter = -self.inverter
-		    if string == 'u' and self.precedingstring != ':':
-		       self.decimals = 1; self.numberpass = 1; self.N_num[na][nb] = self.N_num[na][nb] + 1; self.numbercount = 0; 			       self.inverter=1
+		       self.inverter[na][nb] = -self.inverter[na][nb]
+		    if string == 'M' and self.precedingstring == 'u':
+		       self.decimals = 1; self.numberpass = 1; 
+                       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]]*self.inverter[na][nb]
+		       self.N_num[na][nb] = self.N_num[na][nb] + 1; self.numbercount = 0; self.inverter[na][nb]=1
 	     	    try:
 		       self.c = int(string)
-		       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = (self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] + self.decimals*self.c)*self.inverter
-		       self.decimals = self.decimals*0.1; self.numbercount = 2
+		       self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = (self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] + self.decimals*self.c)
+		       self.decimals = self.decimals*0.1; self.numbercount = self.numbercount+1
 	            except ValueError:
 		       self.decimals = self.decimals
 		    if string == 'e':
-		       self.iEMode = 1
+		       self.iEMode = 1;
 	            if string == '.' and self.numbercount>1:
 				self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]] = 10*self.Ef1[self.Ef1_listLoc[na][nb]][self.N_num[na][nb]]
 				self.decimals = 10*self.decimals
@@ -91,7 +93,6 @@ class noise_canceller(object):
 		      self.precedingstring = self.precedingstring
 		  self.interpret(self.V[a][b][self.i], a, b)
 		  self.i = self.i+1
-		self.inverter = 1;
 	        self.decimals = 1; self.N_num[a][b] = 0; self.numbercount = 0 
 		self.yetanothervariable = 0; self.set[a][b]=0; self.i=0
 # highest variation in difference between two files in file matrix
@@ -174,6 +175,7 @@ def main():
 # [4] not N_num and not self set
 #	print NC.allocationmax
 	print NC.MeanDiff
+
 	
 #
 if __name__ == "__main__":
