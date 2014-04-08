@@ -2,6 +2,31 @@
 # should output a file that gives the difference between two different .feel files, the intention is to build a database, from 0 to 1000 grams load, each file being compared to the 0 load file, that allows us to develop linear approximations for the joints, which in turn will let us guess the weight. Next step will be, if weight is accurate enough, to work with different geometries.
 import os
 
+class torque_acumulator(object):
+	def __init__(self):
+		self.TorqueListMean = [0]*16
+		self.TorqueListLow = [0]*16
+		self.TorqueListHigh = [0]*16
+		self.Den = 0
+	def acum(self, effort_reader):
+		self.Den = self.Den+1
+		for i in range(16):
+			self.TorqueListMean[i] = self.TorqueListMean[i] + effort_reader.Harm_NR[i] 
+			self.TorqueListLow[i] = self.TorqueListLow[i] + effort_reader.Harm_NLest[i] 
+			self.TorqueListHigh[i] = self.TorqueListHigh[i] + effort_reader.Harm_NHest[i]
+	def get_div(self):
+		for i in range(16):
+			self.TorqueListMean[i] = self.TorqueListMean[i]/self.Den 
+			self.TorqueListLow[i] = self.TorqueListLow[i]/self.Den 
+			self.TorqueListHigh[i] = self.TorqueListHigh[i]/self.Den
+	def print_torques(self):
+		print 'The mean torque across the joints is:'
+		print  self.TorqueListMean
+		print 'The lowest for each joint is:'
+		print  self.TorqueListLow
+		print 'The highest for each joint is:'
+		print  self.TorqueListHigh
+
 class impression_taker(object):
 	def __init__(self,a,b):
 		self.numbers= {'number1': repr(a), 'number2':repr(b)}
@@ -144,9 +169,8 @@ class effort_reader(object):
 		      self.Harm_NR[self.i] = self.Harm_N[self.i]/self.Harm_D[self.i]
 		self.i = 0           
 # NEEDS HEAVY CLEANUP
-
 	def print_mean_effort_per_joint(self, a, impression_taker):
-		impression_taker.S.write('The mean torque for each joint in file %s.feel is: uM \n' %a)
+		impression_taker.S.write('The mean torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i < 16:
 		      print self.Harm_NR[self.i]
                       print '\n'
@@ -157,7 +181,7 @@ class effort_reader(object):
 
 # This looks good for now...
 	def print_lowest_recorded_torque(self, a, impression_taker):	
-		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: uM \n' %a)
+		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i <16:
 		      print self.Harm_NLest[self.i]
                       print '\n'
@@ -166,7 +190,7 @@ class effort_reader(object):
 		      self.i = self.i+1
 		self.i = 0
 	def print_highest_recorded_torque(self,a, impression_taker):
-		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: uM \n' %a)
+		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i <16:
 		      print self.Harm_NHest[self.i]
                       print '\n'
@@ -185,7 +209,7 @@ class effort_reader(object):
 
 # Print difference AND clear the object's memory about that specific comparison
 	def print_difference_between_mean_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the mean torques in file 1 and file 2 is: uM\n')
+		impression_taker.S.write('The difference between the mean torques in file 1 and file 2 is: uMl\n')
 		while self.i<16:  
 		      print self.Harm_N1[self.i]
 		      impression_taker.S.write(repr(self.Harm_N1[self.i]))
@@ -195,7 +219,7 @@ class effort_reader(object):
 		self.i=0
                 print '\n'
 	def print_difference_between_lowest_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the lowest recorded torques in file 1 and file 2 is: uM\n')
+		impression_taker.S.write('The difference between the lowest recorded torques in file 1 and file 2 is: uMl\n')
 		while self.i<16: 
 	              print self.Harm_NLest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NLest1[self.i]))
@@ -205,7 +229,7 @@ class effort_reader(object):
 		self.i=0
                 print '\n'
 	def print_difference_between_highest_torques(self, impression_taker):
-		impression_taker.S.write('The difference between the highest recorded torques in file 1 and file 2 is: uM\n')
+		impression_taker.S.write('The difference between the highest recorded torques in file 1 and file 2 is: uMl\n')
 		while self.i<16:      
 		      print self.Harm_NHest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NHest1[self.i]))
