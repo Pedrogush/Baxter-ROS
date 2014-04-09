@@ -29,7 +29,7 @@ class hand_shaker(object):
 		self.gripper = baxter_interface.Gripper('left')
 	        self.left = baxter_interface.Limb('left')
                 self.loopvar = 0
-		self.arg=1
+		self.arg=0
 		self.o=0
 
 	def get_info(self):
@@ -42,20 +42,20 @@ class hand_shaker(object):
 	        self.EN = baxter_interface.RobotEnable()
 	        self.EN.enable()
 	        self.left.set_joint_position_speed(1)
-
+#56 readings cost roughly 7kb
 	def callback(self, data):
 	     self.o=self.o+1
-             if self.o<1000:
+             if self.o<300:
 	     	self.F.write(repr(data.effort))
-             if self.o>1000:
+             if self.o>300:
 		self.F.close()
 
-	def listener(self):
-	    rospy.Subscriber("/robot/joint_states", JointState, self.callback, self.arg)
+	def listener(self): 
+	    rospy.Subscriber("/robot/joint_states", JointState, self.callback)
 
 #NEED TO REMOVE RIGHT ARM VARIABLES FROM EFFORT OUTPUT
 #move along x for 2 centimeters from initial position in the positive direction, then reverses and goes 2 centimeters from initialhttps://github.com/RethinkRobotics/sdk-docs/wiki
-
+# The equation that most likely describes the weights is T = T0 + Te + Tw, with Tw = KX, K=(T-T0)/X +-Te/X
 if __name__ == "__main__":
     main()
 # use head wobbler and tuck arms as examples

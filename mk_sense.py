@@ -28,12 +28,12 @@ class torque_acumulator(object):
 		print  self.TorqueListHigh
 
 class impression_taker(object):
-	def __init__(self,a,b):
-		self.numbers= {'number1': repr(a), 'number2':repr(b)}
-		self.S = open('./resources/{number1}-{number2}.impr'.format(**self.numbers), 'w')
+	def __init__(self,a,b, rootname):
+		self.numbers= {'rootname': rootname, 'number1': repr(a), 'number2':repr(b)}
+		self.S = open('./resources/{rootname}-{number1}-{number2}.impr'.format(**self.numbers), 'w')
 
 class effort_reader(object):
-	def __init__(self, a):
+	def __init__(self, a, nb):
 		self.Harm_N1 = [0]*17
 		self.Harm_NLest1 = [0]*17
 		self.Harm_NHest1 = [0]*17
@@ -42,8 +42,8 @@ class effort_reader(object):
 		self.Harm_D = [0]*17
 		self.Harm_NLest = [100]*17
 		self.Harm_NHest = [0]*17
-		self.size = os.path.getsize('./resources/%s.feel' %a)
-		self.F = open('./resources/%s.feel' %a , 'r')
+		self.size = os.path.getsize('./resources/%s-%s.feel' %(nb,a))
+		self.F = open('./resources/%s-%s.feel' %(nb,a) , 'r')
 		self.V = memoryview(repr(self.F.readlines()))
 		self.numbercount = 0
 		self.decimals = 1

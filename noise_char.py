@@ -1,22 +1,22 @@
 import mk_sense
 import os
 
-EReader = [0]*30
+
 #A = [[0 for i in range(5)] for j in range(5)]
 # purpose is to take a large set of .impr files and return the average variation between differences in them, in this way we can calculate the range in which the measurement for a given variable is likely to be (effort in this case), subsequent development will allow us to gauge weight from torque with a proper treatment to the ''noise'' problem.
 # IMPLEMENT IF atB>atA correctly for this class, save some memory, speed and headaches.
 class noise_canceller(object):
-	def __init__(self, a, b):
+	def __init__(self, a, b, nb):
 		self.a = a; self.b = b; self.F = [[0 for i in range(a)] for j in range(b)]; self.atA = 0
 		self.atB = 0; self.V = [[[] for i in range(a)] for j in range(b)]; self.size = [[0 for i in range(a)] for j in range(b)]
                 while self.atA < a:
 			while self.atB < b-1:
 			    self.atB = self.atB + 1
 			    if self.atB>self.atA:	
-		               self.numbers = {'n1': repr(self.atA),'n2': repr(self.atB)}
-			       self.F[self.atA][self.atB] = open('./resources/{n1}-{n2}.impr'.format(**self.numbers), 'r')
+		               self.numbers = {'rootname': nb, 'n1': repr(self.atA),'n2': repr(self.atB)}
+			       self.F[self.atA][self.atB] = open('./resources/{rootname}-{n1}-{n2}.impr'.format(**self.numbers), 'r')
 			       self.V[self.atA][self.atB] = memoryview(repr(self.F[self.atA][self.atB].read()))
-			       self.size[self.atA][self.atB]= os.path.getsize('./resources/{n1}-{n2}.impr'.format(**self.numbers))
+			       self.size[self.atA][self.atB]= os.path.getsize('./resources/{rootname}-{n1}-{n2}.impr'.format(**self.numbers))
 			self.atB = 0; self.atA = self.atA + 1
 		self.atA = 0; self.atB = 0
 		self.Means = [[[0 for i in range(16)] for j in range(a)] for k in range(b)]
@@ -210,15 +210,20 @@ class noise_canceller(object):
 		print self.ListA
 		
 def main():
+	samples = raw_input('input number of samples desired\n')
+	samples = int(samples)
+	EReader = [0]*samples
 	TA = mk_sense.torque_acumulator()
-	for i in range(30):
-		EReader[i] = mk_sense.effort_reader(i)
+	nb = raw_input('input .feel set root file names\n')
+	for i in range(samples):
+		EReader[i] = mk_sense.effort_reader(i, nb)
 		EReader[i].allocation_def()
 		EReader[i].read_file()
 		EReader[i].calc_values_per_joint()
 		TA.acum(EReader[i])
+		EReader[i].F.close()
 	TA.get_div()
-	NC = noise_canceller(30, 30)
+	NC = noise_canceller(samples, samples, nb)
 	NC.allocation_def()
 	NC.readmatrix()
 # [4] not N_num and not self set
