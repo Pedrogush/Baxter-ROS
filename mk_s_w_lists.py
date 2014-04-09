@@ -11,6 +11,9 @@ samples = int(samples)
 a=0
 T = [0]*samples
 nb = raw_input('input .feel set root file names\n')
+nc = raw_input('input object weight\n')
+with open('register.txt', 'a') as myfile:
+	myfile.write('[%s ;%s samples; %s grams]'%(nb, samples, nc))
 while a<samples:
 	t=0
 	rospy.init_node('move_left_hand')

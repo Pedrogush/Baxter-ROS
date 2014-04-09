@@ -11,6 +11,9 @@ samples = int(samples)
 a=0
 T = [0]*samples
 nb = raw_input('input .feel set root file names\n')
+nc = raw_input('input object weight\n')
+with open('register.txt', 'a') as myfile:
+	myfile.write('[%s ;%s samples; %s grams]'%(nb, samples, grams))
 while a<samples:
 	t=0
 	rospy.init_node('move_left_hand')
@@ -19,5 +22,5 @@ while a<samples:
 	gripper.close(80)
 	T[a].F = open('./resources/%s-%s.feel' %(nb,a), 'w')
 	T[a].listener()
-	rospy.sleep(10.05)
+	rospy.sleep(3.005)
         a=a+1
