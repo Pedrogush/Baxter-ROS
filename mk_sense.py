@@ -27,6 +27,8 @@ class torque_acumulator(object):
 		print 'The highest for each joint is:'
 		print  self.TorqueListHigh
 
+
+
 class impression_taker(object):
 	def __init__(self,a,b, rootname):
 		self.numbers= {'rootname': rootname, 'number1': repr(a), 'number2':repr(b)}
@@ -54,6 +56,17 @@ class effort_reader(object):
 		self.inverter = 1
 		self.interpretV=0
 		self.iEMode = 0
+		self.Ef_Filter = 0
+		self.Ef_Filter_Clone = 0
+		self.j=0
+		self.l=0
+	def rep_filter(self,listf, acc):
+		self.l = filter(lambda x: (sum(listf)/len(listf))-acc<x<(sum(listf)/len(listf))+acc, listf)
+		return self.l
+	def self_filter_Ef(self):
+		for i in range(16):
+			self.Ef_Filter[i] = filter(lambda x: x!=0, self.Ef_Filter[i])
+		self.Ef_Filter = filter(lambda x: x!=[], self.Ef_Filter)
 	def clear(self):
 		self.numbercount = 0
 		self.decimals = 1
@@ -67,6 +80,8 @@ class effort_reader(object):
                 	if self.V[self.i]== '.':
 				self.allocation = self.allocation + 1
                 self.Ef1 = [0]*self.allocation
+		self.Ef_Filter = [[0 for i in range(self.allocation)] for j in range(17)]
+		self.Ef_Filter_Clone =  [[0 for i in range(self.allocation)] for j in range(17)]
 		self.i=0
         def interpret(self, string):
 	 if self.iEMode==0:
@@ -152,6 +167,11 @@ class effort_reader(object):
 
 # run get least and maximum effort before getting mean effort, CODE NEEDS HEAVY CLEANUP
 	def calc_values_per_joint(self):
+		for i in range(self.N_num):
+		        self.Ef_Filter[self.j][i] = self.Ef1[i]
+			self.j = self.j +1
+			if self.j>16:
+				self.j = 0
 		while self.i<self.N_num:
 		     self.Harm_N[self.x] = self.Harm_N[self.x] + self.Ef1[self.i]
 		     self.Harm_D[self.x] = self.Harm_D[self.x] + 1
@@ -249,12 +269,9 @@ def main():
         T = [0]*3
         c1 = 0
 	while c1<2:
-		T[c1] = effort_reader()
-		T[c1].get_user_input()
+		T[c1] = effort_reader(1, 'NoWeight')
 		T[c1].allocation_def()
 		T[c1].read_file()
-		T[c1].get_least_and_maximum_effort_per_joint()
-		T[c1].get_mean_effort_per_joint()
 		T[c1].print_lowest_recorded_torque()
 		T[c1].print_highest_recorded_torque()
                 if c1>0:
@@ -263,7 +280,7 @@ def main():
                         T[c1].print_difference_between_lowest_torques()
                         T[c1].print_difference_between_highest_torques()
                 c1=c1+1
-
+		print self.Ef_Filter
 
 if __name__ == "__main__":
     main()
