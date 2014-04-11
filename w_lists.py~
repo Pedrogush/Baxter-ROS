@@ -1,5 +1,6 @@
 from __future__ import division
 import mk_sense
+from pylab import *
 
 
 # NOW WITH PROPER IMPLEMENTATIONS, PURPOSE IS TO TAKE A SET OF .feel FILES AND CREATE A MUCH LARGER SET OF .impr FILES FROM THE COMPARISON BETWEEN EACH 2 INDIVIDUAL .feel FILES
@@ -13,8 +14,11 @@ imp_t = [0]*(samples*samples)
 nb = raw_input('input .feel set root file names\n')
 A = 0.0
 flag = 0
+F = 0
+f = 0
+F_filtered = 0
 while a<samples:
-        EReader[a] = mk_sense.effort_reader(a, nb)
+        EReader[a] = mk_sense.effort_reader(a, nb, nb)
         EReader[a].allocation_def()
         EReader[a].read_file()
 	EReader[a].calc_values_per_joint()
@@ -47,25 +51,52 @@ while a<30:
 def rep_filter(listf, acc):
 	l = filter(lambda x: (sum(listf)/len(listf))-acc<x<(sum(listf)/len(listf))+acc, listf)
 	return l
+def filter_rule(x,freq):
+    band = 0.01
+    if abs(freq)>0+band or abs(freq)<0-band:
+        return 0
+    else:
+        return x
 # acc = 0.02 yields good results most of the time, must write code to iterate and try different values of acc
-for i in range(samples):
-	for j in range(14):
-		acc = 0.0
-		while flag==0:
-			EReader[i].Ef_Filter_Clone[j] = EReader[i].Ef_Filter[j]
-			EReader[i].Ef_Filter_Clone[j] = rep_filter(EReader[i].Ef_Filter_Clone[j], acc)
-			if len(EReader[i].Ef_Filter_Clone[j])>0:
-					flag = 1
-			if len(EReader[i].Ef_Filter_Clone[j])==0:
-					acc = acc+0.001
-		flag=0
-for m in range(14):
-	for i in range(samples):
-		print sum(EReader[i].Ef_Filter_Clone[m])/float(len(EReader[i].Ef_Filter_Clone[m]))
+# need to throw this to one of the classes, most likely effort_reader in module mk_sense
+#for i in range(samples):
+#	for j in range(14):
+#		acc = 0.0
+#		while flag==0:
+#			EReader[i].Ef_Filter_Clone[j] = EReader[i].Ef_Filter[j]
+#			EReader[i].Ef_Filter_Clone[j] = rep_filter(EReader[i].Ef_Filter_Clone[j], acc)
+#			if len(EReader[i].Ef_Filter_Clone[j])>0:
+#					flag = 1
+#			if len(EReader[i].Ef_Filter_Clone[j])==0:
+#					acc = acc+0.01
+#		flag=0
+#for m in range(14):
+#	for i in range(samples):
+#		print sum(EReader[i].Ef_Filter_Clone[m])/float(len(EReader[i].Ef_Filter_Clone[m]))
+dt = 0.01
+s_time = [0]*samples
 print '\n'
-	
-print acc
+for i in range(samples):
+	s_time[i] = [k*dt for k in range(len(EReader[i].Ef_Filter[1]))]
+	F = fft(EReader[i].Ef_Filter[1])
+	f = fftfreq(len(F),0.01)
+	F_filtered = array([filter_rule(x,freq) for x,freq in zip(F,f)])
+	F_filtered = ifft(F_filtered)
+	F = ifft(F)
+	print f
+	print F_filtered
+	figure()
 
+	subplot(1,1,1)
+	plot(s_time[0],F_filtered,'r')
+	plot(s_time[0],F,'b')
+	xlabel('time [s]')
+
+	show()
 #	for i in range(len(EReader[i].Ef_Filter[0])-1):
 #		A = A + EReader[i].Ef_Filter[i][0]
 #	print A
+
+ 
+#
+ 

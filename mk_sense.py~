@@ -32,7 +32,7 @@ class torque_acumulator(object):
 class impression_taker(object):
 	def __init__(self,a,b, rootname):
 		self.numbers= {'rootname': rootname, 'number1': repr(a), 'number2':repr(b)}
-		self.S = open('./resources/{rootname}-{number1}-{number2}.impr'.format(**self.numbers), 'w')
+		self.S = open('./resources/{rootname}/{rootname}-{number1}-{number2}.impr'.format(**self.numbers), 'w')
 
 class effort_reader(object):
 	def __init__(self, a, nb):
@@ -57,6 +57,7 @@ class effort_reader(object):
 		self.interpretV=0
 		self.iEMode = 0
 		self.Ef_Filter = 0
+		self.Ef_Filter_Clone = 0
 		self.j=0
 		self.l=0
 	def rep_filter(self,listf, acc):
@@ -80,6 +81,7 @@ class effort_reader(object):
 				self.allocation = self.allocation + 1
                 self.Ef1 = [0]*self.allocation
 		self.Ef_Filter = [[0 for i in range(self.allocation)] for j in range(17)]
+		self.Ef_Filter_Clone =  [[0 for i in range(self.allocation)] for j in range(17)]
 		self.i=0
         def interpret(self, string):
 	 if self.iEMode==0:
