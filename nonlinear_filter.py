@@ -1,16 +1,19 @@
-foo = [12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.51, 12.52, 12.53, 12.54, 12.6, 12.7, 12.8, 12.9, 13, 200, 19, 0, 8, 9.1, 0, 0 ,0 ,0 ,0 ,0 ,0, 0 ,0, 0 ,0, 0,0,0]
-fua = [0, 0, 0, 1]
-fuda = [[1, 2, 3, 4], [5, 6, 7, 8]]
-flima = [[[0,1],[7,8]],[[0,1], [9,10]]]
-flemba = [[[[256],[127],[64],[12]]]]
-acc= float(1)
+from __future__ import division
+import mk_sense
+from pylab import *
+
+#foo = [12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.51, 12.52, 12.53, 12.54, 12.6, 12.7, 12.8, 12.9, 13, 200, 19, 0, 8, 9.1, 0, #0 ,0 ,0 ,0 ,0 ,0, 0 ,0, 0 ,0, 0,0,0, -92012]
+#fua = [0, 0, 0, 1]
+#fuda = [[1, 2, 3, 4], [5, 6, 7, 8]]
+#flima = [[[0,1],[7,8]],[[0,1], [9,10]]]
+#flemba = [[[[256],[127],[64],[12]]]]
+#acc= float(1)
+#print max(flemba)
+#print min(flemba)
 
 def rep_filter(listf, acc):
-	print sum(listf)/len(listf)
 	l = filter(lambda x: (sum(listf)/len(listf))-acc<x<(sum(listf)/len(listf))+acc, listf)
 	return l
-foo = rep_filter(foo, 0.05)
-print foo
 
 def function_a(fua, foo):
 	for i in range(len(fua)):
@@ -42,11 +45,10 @@ def break_list_and_append_to(listA, foo):
 				function_a2(listA, foo)
 			except TypeError:
 				function_a(listA, foo)
-break_list_and_append_to(fua, foo)
-break_list_and_append_to(fuda, foo)
-break_list_and_append_to(flima, foo)
-break_list_and_append_to(flemba, foo)
-print foo
+#break_list_and_append_to(fua, foo)
+#break_list_and_append_to(fuda, foo)
+#break_list_and_append_to(flima, foo)
+#break_list_and_append_to(flemba, foo)
 
 		
 

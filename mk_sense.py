@@ -26,16 +26,27 @@ class torque_acumulator(object):
 		print  self.TorqueListLow
 		print 'The highest for each joint is:'
 		print  self.TorqueListHigh
-
+def rootname_minus_n(rootname):
+	p = ''
+	rootname.split()
+	for i in range(len(rootname)):
+		try:
+			int(rootname[i])
+		except ValueError:
+			p = p + rootname[i]
+	return p
+			
 
 
 class impression_taker(object):
 	def __init__(self,a,b, rootname):
-		self.numbers= {'rootname': rootname, 'number1': repr(a), 'number2':repr(b)}
-		self.S = open('./resources/{rootname}/{rootname}-{number1}-{number2}.impr'.format(**self.numbers), 'w')
+		self.p = rootname_minus_n(rootname)
+		self.numbers= {'p': self.p,'rootname': rootname, 'number1': repr(a), 'number2':repr(b)}
+		self.S = open('./resources/{p}/{rootname}{number1}-{number2}.impr'.format(**self.numbers), 'w')
 
 class effort_reader(object):
 	def __init__(self, a, nb, rootname):
+		self.p = rootname_minus_n(rootname)
 		self.Harm_N1 = [0]*17
 		self.Harm_NLest1 = [0]*17
 		self.Harm_NHest1 = [0]*17
@@ -44,8 +55,8 @@ class effort_reader(object):
 		self.Harm_D = [0]*17
 		self.Harm_NLest = [100]*17
 		self.Harm_NHest = [0]*17
-		self.size = os.path.getsize('./resources/%s/%s-%s.feel' %(rootname,nb,a))
-		self.F = open('./resources/%s/%s-%s.feel' %(rootname,nb,a) , 'r')
+		self.size = os.path.getsize('./resources/%s/%s-%s.feel' %(self.p,nb,a))
+		self.F = open('./resources/%s/%s-%s.feel' %(self.p,nb,a) , 'r')
 		self.V = memoryview(repr(self.F.readlines()))
 		self.numbercount = 0
 		self.decimals = 1
@@ -192,8 +203,6 @@ class effort_reader(object):
 	def print_mean_effort_per_joint(self, a, impression_taker):
 		impression_taker.S.write('The mean torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i < 16:
-		      print self.Harm_NR[self.i]
-                      print '\n'
 		      impression_taker.S.write(repr(self.Harm_NR[self.i]))
 		      impression_taker.S.write('uM')
                       self.i = self.i+1
@@ -203,8 +212,6 @@ class effort_reader(object):
 	def print_lowest_recorded_torque(self, a, impression_taker):	
 		impression_taker.S.write('The lowest recorded torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i <16:
-		      print self.Harm_NLest[self.i]
-                      print '\n'
 		      impression_taker.S.write(repr(self.Harm_NLest[self.i]))
 		      impression_taker.S.write('uM')
 		      self.i = self.i+1
@@ -212,8 +219,6 @@ class effort_reader(object):
 	def print_highest_recorded_torque(self,a, impression_taker):
 		impression_taker.S.write('The highest recorded torque for each joint in file %s.feel is: uMl \n' %a)
 		while self.i <16:
-		      print self.Harm_NHest[self.i]
-                      print '\n'
 		      impression_taker.S.write(repr(self.Harm_NHest[self.i]))
 		      impression_taker.S.write('uM')
 		      self.i = self.i+1
@@ -231,33 +236,24 @@ class effort_reader(object):
 	def print_difference_between_mean_torques(self, impression_taker):
 		impression_taker.S.write('The difference between the mean torques in file 1 and file 2 is: uMl\n')
 		while self.i<16:  
-		      print self.Harm_N1[self.i]
 		      impression_taker.S.write(repr(self.Harm_N1[self.i]))
 		      impression_taker.S.write('uM')
 		      self.i = self.i+1
-                      print '\n'
 		self.i=0
-                print '\n'
 	def print_difference_between_lowest_torques(self, impression_taker):
 		impression_taker.S.write('The difference between the lowest recorded torques in file 1 and file 2 is: uMl\n')
 		while self.i<16: 
-	              print self.Harm_NLest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NLest1[self.i]))
                       impression_taker.S.write('uM')
 		      self.i = self.i+1
-                      print '\n'
 		self.i=0
-                print '\n'
 	def print_difference_between_highest_torques(self, impression_taker):
 		impression_taker.S.write('The difference between the highest recorded torques in file 1 and file 2 is: uMl\n')
 		while self.i<16:      
-		      print self.Harm_NHest1[self.i]
 	              impression_taker.S.write(repr(self.Harm_NHest1[self.i]))
 	              impression_taker.S.write('uM')
 		      self.i = self.i+1
-                      print '\n'
 		self.i=0
-                print '\n'
         def read_file(self):
 		while self.i<self.size+1:
 		  self.interpret(self.V[self.i])
