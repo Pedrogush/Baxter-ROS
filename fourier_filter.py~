@@ -3,24 +3,75 @@ import mk_sense
 from pylab import *
 import numpy
 
+# take a list and return the n most common elements near a certain value:
+def return_common_elements(listf, value, nc, precision):
+	cel = [0]*nc
+	cel_count = [0]*nc
+	a = 0;
+	for i in range(len(listf)):
+			if abs(listf[i]-value)<precision:
+					if listf[i] not in cel and listf.count(listf[i])>cel_count[a] and cel_count[a] == min(cel_count):
+						cel[a] = listf[i]
+						cel_count[a] = listf.count(cel[a])
+						a=cel_count.index(min(cel_count))
+	cel_p_c = zip(cel_count, cel)
+	cel_p_c.sort(); cel_p_c.reverse()
+	return cel_p_c, cel
+
+# take a list and return a list containing only elements within a certain distance of the mean value
+def rep_filter(listf, acc):
+	l = filter(lambda x: (sum(listf)/len(listf))-acc<x<(sum(listf)/len(listf))+acc, listf)
+	return l
+# take a list and return a list containing only elements outside a certain distance of the mean value
+def rep_reject_filter(listf, acc):
+	l = filter(lambda x: (sum(listf)/len(listf))-acc>x or x>(sum(listf)/len(listf))+acc, listf)
+	return l
+
+# auxiliary for fft_filter()
 def filter_rule(x,freq, band):
     if abs(freq)>0+band or abs(freq)<0-band:
         return 0
     else:
         return x
+# auxiliary for fft_filter_band_reject()
 def filter_rule_band_reject(x, freq, band):
-	if band>abs(freq)>-band:
+	if band>abs(freq)>-band or freq==band:
 		return 0
 	else:
 		return x
 
+# local_max_list return a list of the local maximums given a certain resolution
+
+# accept a band centered around 0 in the transform
 def fft_filter(ListA, dt, band):
+	F = fft(ListA)
+	f = fftfreq(len(F),dt)
+	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
+	F_filtered = ifft(F_filtered)
+	return F_filtered
+
+# reject a certain band centered around 0 in the transform
+def fft_filter_band_reject(ListA, dt, band):
 	F = fft(ListA)
 	f = fftfreq(len(F),dt)
 	F_filtered = array([filter_rule_band_reject(x,freq, band) for x,freq in zip(F,f)])
 	F_filtered = ifft(F_filtered)
-	return F_filtered		
-
+	return F_filtered
+# find first n fundamental frequencies in the transform.
+def fft_filter_find_fundamentals(ListA, dt, n):
+	F = fft(ListA)
+	f = fftfreq(len(F),dt)
+	m = 0
+	for j in range(n):
+		m = filter(lambda x: x!=0 and x>m, f)
+		for i in range(len(m)):
+			m[i] = abs(m[i])
+		m = min(m)
+	F_filtered = array([filter_rule(x,freq, m) for x,freq in zip(F,f)])
+	F_filtered = ifft(F_filtered)
+	return F_filtered
+		
+# plot a given figure
 def show_fig(F_filtered, dt, l):
 	s_time = [k*dt for k in range(len(F_filtered))]
 	figure()
@@ -29,18 +80,8 @@ def show_fig(F_filtered, dt, l):
 	number = {'i': l}
 	xlabel('{i}, time [s]'.format(**number))
 	show()
-def get_high_signal(F_filtered, b):
-	hs = 0.0
-	for i in range(b):
-		if F_filtered[i]>hs:
-			hs = F_filtered[i]
-	return hs 
-def get_low_signal(F_filtered, b):
-	ls = 0.0
-	for i in range(b):
-		if F_filtered[i]<ls:
-			ls = F_filtered[i]
-	return ls 
+
+# Moving averages method for a rectangular window
 
 def moving_average(ListA, window, dt, l):
 #	np = hanning(len(ListA)-window)
@@ -61,7 +102,7 @@ def moving_average(ListA, window, dt, l):
 	return average
 
 		
-
+# auxiliary functions for break_list_and_append_to
 def function_a(fua, foo):
 	for i in range(len(fua)):
 		foo.append(fua[i])
@@ -80,7 +121,7 @@ def function_a4(flemba, foo):
 			for k in range(len(flemba[i][j])):
 				for m in range(len(flemba[i][j][k])):
 					foo.append(flemba[i][j][k][m])
-
+# takes a list and removes up to 3 dimensions from it, creating a list of single elements
 def break_list_and_append_to(listA, foo):
 	try:
 		function_a4(listA, foo)
@@ -94,12 +135,6 @@ def break_list_and_append_to(listA, foo):
 				function_a(listA, foo)
 
 
-A = [0]*2
-B = [[1],[2],[3]]
-C = [[0, 0], [0,0],[1], [1, 3]]
-break_list_and_append_to(C, A)
-break_list_and_append_to(B, A)
-print A
 
 		
 	

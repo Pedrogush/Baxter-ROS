@@ -105,8 +105,11 @@ for i in range(14):
 #	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 50,0.01)
 for i in range(7):
 
-	sum_of_Ef[i] = rep_filter(sum_of_Ef[i], 0.08)
-	sum_of_Ef[i] = fourier_filter.fft_filter(sum_of_Ef[i], 0.01, 0.1)
+	print fourier_filter.return_common_elements(sum_of_Ef[i], sum(sum_of_Ef[i])/len(sum_of_Ef[i]), 20, 0.5)
+	print len(sum_of_Ef[i])
+	sum_of_Ef[i] = fourier_filter.rep_reject_filter(sum_of_Ef[i], 0)
+	sum_of_Ef[i] = fourier_filter.fft_filter_find_fundamentals(sum_of_Ef[i], 0.01, (len(sum_of_Ef[i])//300))
+#	sum_of_Ef[i] = fourier_filter.fft_filter_find_fundamentals(sum_of_Ef[i], 0.01, 600)
 #	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 75,0.01, i)
 #	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 100,0.01, i)
 #	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 125,0.01, i)
@@ -115,7 +118,11 @@ for i in range(7):
 #	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 1000,0.01, i)
 	fourier_filter.show_fig(sum_of_Ef[i], 0.01, i)
 	print sum(sum_of_Ef[i])/len(sum_of_Ef[i])
+	sum_of_Ef[i] = fourier_filter.fft_filter_band_reject(sum_of_Ef[i], 0.01, 0)
+	print max(sum_of_Ef[i])
+	print min(sum_of_Ef[i])
 	print (max(sum_of_Ef[i]) - min(sum_of_Ef[i]))/2
+
 #	print 100*((max(sum_of_Ef[i]) - min(sum_of_Ef[i]))/2)/(sum(sum_of_Ef[i])/len(sum_of_Ef[i]))
 #fourier_filter.moving_average(sum_of_Ef[0], 99, 0.01)
 #for i in range(14):

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# should output a file that gives the difference between two different .feel files, the intention is to build a database, from 0 to 1000 grams load, each file being compared to the 0 load file, that allows us to develop linear approximations for the joints, which in turn will let us guess the weight. Next step will be, if weight is accurate enough, to work with different geometries.
+# should output a file that gives the difference between two different .feel files, the intention is to build a database, from 0 to 1000 grams load, each file being compared to the 0 load file, that allows us to develop linear approximations for the joints, which in turn will let us guess the weight.
 import os
 
 class torque_acumulator(object):
