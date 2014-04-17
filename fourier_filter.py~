@@ -44,31 +44,30 @@ def return_average(args):
 	n = [0]*len(args[0])
 	for i in range(len(args)):
 		for j in range(len(args[i])):
-			n[j] += abs(args[i][j])
-
-			n[j] = n[j]*(1/len(args))		
+			n[j] += abs(args[i][j])		
 	return n
 
 # accept a band centered around 0 in the transform
 def fft_filter(ListA, dt, band):
-	F = fft(ListA)
+	F = fft(ListA, n=3000)
 	f = fftfreq(len(F),dt)
 	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
 	F_filtered = ifft(F_filtered)
+	print F_filtered
 	return F_filtered
 
 # reject a certain band centered around 0 in the transform
 def fft_filter_band_reject(ListA, dt, band):
-	F = fft(ListA)
+	F = fft(ListA, n=1024)
 	f = fftfreq(len(F),dt)
 	F_filtered = array([filter_rule_band_reject(x,freq, band) for x,freq in zip(F,f)])
 	F_filtered = ifft(F_filtered)
 	return F_filtered
 # find first n fundamental frequencies in the transform.
 def fft_filter_find_fundamentals(ListA, dt, n):
-	F = fft(ListA)
+	F = fft(ListA, n=1024)
 	f = fftfreq(len(F),dt)
-	m = 0
+	m = 0; a=0
 	for j in range(n):
 		m = filter(lambda x: x!=0 and x>m, f)
 		for i in range(len(m)):
@@ -79,7 +78,7 @@ def fft_filter_find_fundamentals(ListA, dt, n):
 	return F_filtered
 # find last n fundamental frequencies in the transform.
 def fft_filter_find_last_fundamentals(ListA, dt, n):
-	F = fft(ListA)
+	F = fft(ListA, n=1024)
 	f = fftfreq(len(F),dt)
 	m = 0	
 	for j in range(n):
@@ -101,7 +100,7 @@ def show_fig(F_filtered, dt, l):
 	xlabel('{i}, time [s]'.format(**number))
 	show()
 def show_power_spectrum(F_filtered, dt, l):
-	F = fft(F_filtered)
+	F = fft(F_filtered, n=1024)
 	f = fftfreq(len(F), dt)
 	F2 = log10(np.abs(F)**2)
 	idx = argsort(f)
@@ -113,7 +112,7 @@ def show_power_spectrum(F_filtered, dt, l):
 	show()
 
 def show_phase_spectrum(F_filtered, dt, l):
-	F = fft(F_filtered)
+	F = fft(F_filtered, n=1024)
 	f = fftfreq(len(F), dt)
 	F2 = np.angle(F)
 	idx = argsort(f)

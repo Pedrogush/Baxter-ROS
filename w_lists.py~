@@ -1,6 +1,7 @@
 from __future__ import division
 import mk_sense
 from pylab import *
+import numpy as np
 import nonlinear_filter
 import fourier_filter
 
@@ -27,6 +28,7 @@ class weight_eval_p(object):
 		self.sum_of_Ef = [[] for i in range(14)];
 		self.spawn_EReaders()
 		self.get_organized_Ef()
+		self.f = 0
 	def spawn_EReaders(self):
 		while self.a<self.samples:
 			self.EReader[self.a] = mk_sense.effort_reader(self.a, self.nb, self.nb)
@@ -100,11 +102,12 @@ class weight_eval_p(object):
 
 	def get_sum_of_torque_values(self):
 		self.M = fourier_filter.return_average(self.sum_of_Ef[0:6])
-		self.M = fourier_filter.rep_filter(self.M, 0.3) 
+		self.M = fourier_filter.rep_filter(self.M, 2)
+	def show_torque_fig(self): 
 		fourier_filter.show_fig(self.M, 0.01, 0)
 		fourier_filter.show_power_spectrum(self.M, 0.01, 0)
 	def sum_filter_routine_1(self):
-		self.M = fourier_filter.fft_filter_find_fundamentals(self.M, 0.01, len(self.M)//10)
+		self.M = fourier_filter.fft_filter_find_fundamentals(self.M, 0.01, 100)
 		fourier_filter.show_fig(self.M, 0.01, 0)
 		fourier_filter.show_power_spectrum(self.M, 0.01, 0)		
 #fourier_filter.moving_average(sum_of_Ef[2], 2, 0.01)
@@ -134,9 +137,24 @@ class weight_eval_p(object):
 		print min(self.sum_of_Ef[i])
 		print (max(self.sum_of_Ef[i]) - min(self.sum_of_Ef[i]))/2
 
-def spectral_subtraction(WEP1, WEP2):
+def spectral_subtraction(WEP1, WEP2, dt):
+	result = [0]*3000
 	WEP1.get_sum_of_torque_values()
+	WEP2.get_sum_of_torque_values()
+	WEP1.M = fourier_filter.fft_filter(WEP1.M, 0.01, 2)
+	WEP1.f = fftfreq(len(WEP1.M), dt)
+	WEP2.M = fourier_filter.fft_filter(WEP2.M, 0.01, 2)
+	WEP2.f = fftfreq(len(WEP2.M), dt)
+	for i in range(1500):
+		result[i] = abs(abs(WEP1.M[i]) - abs(WEP2.M[i]))
+	result = array([fourier_filter.filter_rule(x,freq, 50) for x,freq in zip(result,WEP1.f)])
+	result = irfft(result)
+	result = fourier_filter.rep_filter(result, 0.1)
+	return result
 
+
+	
+	
 #	print 100*((max(sum_of_Ef[i]) - min(sum_of_Ef[i]))/2)/(sum(sum_of_Ef[i])/len(sum_of_Ef[i]))
 #fourier_filter.moving_average(sum_of_Ef[0], 99, 0.01)
 #for i in range(14):
@@ -146,11 +164,8 @@ def spectral_subtraction(WEP1, WEP2):
 #	print A
 def main():
 	WEP = weight_eval_p()
-	WEP.generate_impr()
-	WEP.get_sum_of_torque_values()
-	WEP.sum_filter_routine_1()
-	WEP.filter_routine_1()
-	WEP.show_mean_max_min_and_range()
+	WEP2 = weight_eval_p()
+        fourier_filter.show_fig(spectral_subtraction(WEP, WEP2, 0.01), 0.01, 0)
  
 
 if __name__ == "__main__":
