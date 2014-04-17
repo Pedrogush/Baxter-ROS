@@ -1,7 +1,7 @@
 from __future__ import division
 import mk_sense
 from pylab import *
-import numpy
+import numpy as np
 
 # take a list and return the n most common elements near a certain value:
 def return_common_elements(listf, value, nc, precision):
@@ -9,8 +9,7 @@ def return_common_elements(listf, value, nc, precision):
 	cel_count = [0]*nc
 	a = 0;
 	for i in range(len(listf)):
-			if abs(listf[i]-value)<precision:
-					if listf[i] not in cel and listf.count(listf[i])>cel_count[a] and cel_count[a] == min(cel_count):
+			if abs(listf[i]-value)<precision and listf[i] not in cel and listf.count(listf[i])>cel_count[a]:
 						cel[a] = listf[i]
 						cel_count[a] = listf.count(cel[a])
 						a=cel_count.index(min(cel_count))
@@ -40,7 +39,15 @@ def filter_rule_band_reject(x, freq, band):
 	else:
 		return x
 
-# local_max_list return a list of the local maximums given a certain resolution
+# take a certain number floats and return geometric average
+def return_average(args):
+	n = [0]*len(args[0])
+	for i in range(len(args)):
+		for j in range(len(args[i])):
+			n[j] += abs(args[i][j])
+
+			n[j] = n[j]*(1/len(args))		
+	return n
 
 # accept a band centered around 0 in the transform
 def fft_filter(ListA, dt, band):
@@ -70,7 +77,20 @@ def fft_filter_find_fundamentals(ListA, dt, n):
 	F_filtered = array([filter_rule(x,freq, m) for x,freq in zip(F,f)])
 	F_filtered = ifft(F_filtered)
 	return F_filtered
-		
+# find last n fundamental frequencies in the transform.
+def fft_filter_find_last_fundamentals(ListA, dt, n):
+	F = fft(ListA)
+	f = fftfreq(len(F),dt)
+	m = 0	
+	for j in range(n):
+		m = filter(lambda x: x!=0 and x>m, f)
+		for i in range(len(m)):
+			m[i] = abs(m[i])
+		m = min(m)
+
+	F_filtered = array([filter_rule_band_reject(x,freq, m) for x,freq in zip(F,f)])
+	F_filtered = ifft(F_filtered)
+	return F_filtered
 # plot a given figure
 def show_fig(F_filtered, dt, l):
 	s_time = [k*dt for k in range(len(F_filtered))]
@@ -80,6 +100,30 @@ def show_fig(F_filtered, dt, l):
 	number = {'i': l}
 	xlabel('{i}, time [s]'.format(**number))
 	show()
+def show_power_spectrum(F_filtered, dt, l):
+	F = fft(F_filtered)
+	f = fftfreq(len(F), dt)
+	F2 = log10(np.abs(F)**2)
+	idx = argsort(f)
+	figure()
+	subplot(1,1,1)
+	plot(f[idx],F2[idx],'r')
+	number = {'i': l}
+	xlabel('{i}, freq [hz]'.format(**number))
+	show()
+
+def show_phase_spectrum(F_filtered, dt, l):
+	F = fft(F_filtered)
+	f = fftfreq(len(F), dt)
+	F2 = np.angle(F)
+	idx = argsort(f)
+	figure()
+	subplot(1,1,1)
+	plot(f[idx],F2[idx],'r')
+	number = {'i': l}
+	xlabel('{i}, freq [hz]'.format(**number))
+	show()
+
 
 # Moving averages method for a rectangular window
 
