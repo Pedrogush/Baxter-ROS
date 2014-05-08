@@ -22,5 +22,5 @@ while a<samples:
 	gripper.close(80)
 	T[a].F = open('./resources/%s-%s.feel' %(nb,a), 'w')
 	T[a].listener()
-	rospy.sleep(3.005)
+	rospy.sleep(30.05)
         a=a+1

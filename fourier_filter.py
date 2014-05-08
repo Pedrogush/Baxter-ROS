@@ -19,7 +19,7 @@ def return_common_elements(listf, value, nc, precision):
 
 # take a list and return a list containing only elements within a certain distance of the mean value
 def rep_filter(listf, acc):
-	l = filter(lambda x: (sum(listf)/len(listf))-acc<x<(sum(listf)/len(listf))+acc, listf)
+	l = filter(lambda x: -acc<x<+acc, listf)
 	return l
 # take a list and return a list containing only elements outside a certain distance of the mean value
 def rep_reject_filter(listf, acc):
@@ -39,9 +39,9 @@ def filter_rule_band_reject(x, freq, band):
 	else:
 		return x
 
-# take a certain number floats and return geometric average
+# take a certain number floats and return 
 def return_average(args):
-	n = [0]*len(args[0])
+	n = [0]*len(args[0])*len(args)
 	for i in range(len(args)):
 		for j in range(len(args[i])):
 			n[j] += abs(args[i][j])		
@@ -51,6 +51,14 @@ def return_average(args):
 def fft_filter(ListA, dt, band):
 	F = rfft(ListA, n=3000)
 	f = fftfreq(len(F),dt)
+	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
+	print F_filtered
+	return F_filtered
+def filter_phase(ListA, dt, band):
+	F = rfft(ListA, n=3000)
+	f = fftfreq(len(F),dt)
+	for i in range(len(F)):
+		F[i] = abs(F[i])
 	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
 	F_filtered = irfft(F_filtered)
 	print F_filtered

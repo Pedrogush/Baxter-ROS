@@ -4,6 +4,9 @@ from pylab import *
 import numpy as np
 import nonlinear_filter
 import fourier_filter
+from scipy.signal import spectral
+
+# periodogram = spectral.lombscargle(time, scaled_mags, freqs)
 
 # NOW WITH PROPER IMPLEMENTATIONS, PURPOSE IS TO TAKE A SET OF .feel FILES AND CREATE A MUCH LARGER SET OF .impr FILES FROM THE BETWEEN EACH COMPARISON 2 INDIVIDUAL .feel FILES
 # Needs to be looked at, comparison looks wobly at best, maybe just a question of having the list shift back one position
@@ -102,7 +105,10 @@ class weight_eval_p(object):
 
 	def get_sum_of_torque_values(self):
 		self.M = fourier_filter.return_average(self.sum_of_Ef[0:6])
-		self.M = fourier_filter.rep_filter(self.M, 2)
+	def get_sum_of_torque_values_no_phase(self):
+		self.M = fourier_filter.return_average(self.sum_of_Ef[0:6])
+		self.M = fourier_filter.filter_phase(self.M, 0.01, 50)
+
 	def show_torque_fig(self): 
 		fourier_filter.show_fig(self.M, 0.01, 0)
 		fourier_filter.show_power_spectrum(self.M, 0.01, 0)
@@ -138,18 +144,27 @@ class weight_eval_p(object):
 		print (max(self.sum_of_Ef[i]) - min(self.sum_of_Ef[i]))/2
 
 def spectral_subtraction(WEP1, WEP2, dt):
-	result = [0]*3000
-	WEP1.get_sum_of_torque_values()
-	WEP2.get_sum_of_torque_values()
-	WEP1.M = fourier_filter.fft_filter(WEP1.M, 0.01, 10)
+	WEP1.get_sum_of_torque_values_no_phase()
+	WEP2.get_sum_of_torque_values_no_phase()
+	kep1 = np.hanning(len(WEP1.M))
+	kep2 = np.hanning(len(WEP2.M))
+	for i in range(len(WEP1.M)):
+		WEP1.M[i] = WEP1.M[i]*kep1[i]
+	for i in range(len(WEP2.M)):
+		WEP2.M[i] = WEP2.M[i]*kep2[i]
+	WEP1.M = fourier_filter.fft_filter(WEP1.M, 0.01, 50)
 	WEP1.f = fftfreq(len(WEP1.M), dt)
-	WEP2.M = fourier_filter.fft_filter(WEP2.M, 0.01, 10)
+	WEP2.M = fourier_filter.fft_filter(WEP2.M, 0.01, 50)
 	WEP2.f = fftfreq(len(WEP2.M), dt)
-	for i in range(1500):
-		result[i] = abs(abs(WEP1.M[i]) - abs(WEP2.M[i]))
-	result = array([fourier_filter.filter_rule(x,freq, 50) for x,freq in zip(result,WEP1.f)])
-	result = irfft(result)
-	result = fourier_filter.rep_filter(result, 0.1)
+	result = [0]*len(WEP1.M)
+	for i in range(len(WEP1.M)):
+		result[i] = abs(WEP1.M[i]) - abs(WEP2.M[i])
+	k = np.hanning(len(result))
+	result = ifft(result)
+	for i in range(len(result)):
+		result[i] = k[i]*result[i]
+#	result = array([fourier_filter.filter_rule(x,freq, 50) for x,freq in zip(result,WEP1.f)])
+	print sum(result)/len(result)
 	return result
 
 
@@ -166,7 +181,12 @@ def main():
 	WEP = weight_eval_p()
 	WEP2 = weight_eval_p()
         fourier_filter.show_fig(spectral_subtraction(WEP, WEP2, 0.01), 0.01, 0)
- 
+	fourier_filter.show_fig(ifft(WEP.M), 0.01, 50)	
+	fourier_filter.show_fig(ifft(WEP2.M), 0.01, 50)		
+ 	K = [0]*len(ifft(WEP.M))
+	for i in range(len(WEP.M)):
+		K[i] = abs(ifft(WEP.M)[i]) - abs(ifft(WEP2.M)[i])
+	fourier_filter.show_fig(K, 0.01, 50)
 
 if __name__ == "__main__":
         main()
