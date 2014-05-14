@@ -192,8 +192,8 @@ def main():
 	K = fourier_filter.fft_filter_find_fundamentals(K, 0.05, 4)
 	fourier_filter.show_fig(K, 0.05, 0)
 	print sum(K)/len(K)
-	WEP.filter_routine_1(0.05)
-	WEP2.filter_routine_1(0.05)
+	WEP.filter_routine_1(0.01)
+	WEP2.filter_routine_1(0.01)
 if __name__ == "__main__":
         main()
  

@@ -127,8 +127,8 @@ class weight_eval_p(object):
 		#	sum_of_Ef[i] = fourier_filter.fft_filter_find_last_fundamentals(sum_of_Ef[i], 0.01, (len(sum_of_Ef[i])//30))
 		#	sum_of_Ef[i] = fourier_filter.fft_filter_find_fundamentals(sum_of_Ef[i], 0.01, (len(sum_of_Ef[i])//31))
 
-		##	self.sum_of_Ef[i] = fourier_filter.moving_average(self.sum_of_Ef[i], 10,0.05, i)
-		##	self.sum_of_Ef[i] = fourier_filter.fft_filter(self.sum_of_Ef[i], 0.05, 1)
+			self.sum_of_Ef[i] = fourier_filter.moving_average(self.sum_of_Ef[i], 10,0.05, i)
+			self.sum_of_Ef[i] = fourier_filter.fft_filter(self.sum_of_Ef[i], 0.05, 1)
 
 		#	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 100,0.01, i)
 		#	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 125,0.01, i)
