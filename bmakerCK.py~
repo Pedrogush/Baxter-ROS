@@ -193,8 +193,9 @@ class hand_shaker(object):
 #56 readings cost roughly 7kb
 	def callback(self, data):
 	     readinterval = rospy.Time.now() - self.strt
-             if self.o<3000 and readinterval.to_sec() >0.01:
+             if self.o<1000 and readinterval.to_sec() >0.04:
 	     	self.F.write(repr(data.effort))
+		print readinterval.to_sec()
 		self.strt = rospy.Time.now()
 		self.o=self.o+1
              if self.o>3000:

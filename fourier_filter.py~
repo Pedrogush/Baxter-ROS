@@ -39,7 +39,7 @@ def filter_rule_band_reject(x, freq, band):
 	else:
 		return x
 
-# take a certain number floats and return sum
+# take a certain number floats and return 
 def return_average(args):
 	n = [0]*len(args[0])*len(args)
 	for i in range(len(args)):
@@ -51,9 +51,9 @@ def return_average(args):
 def fft_filter(ListA, dt, band):
 	F = rfft(ListA, n=3000)
 	f = fftfreq(len(F),dt)
-
-	print F
-	return F
+	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
+	print F_filtered
+	return F_filtered
 def filter_phase(ListA, dt, band):
 	F = rfft(ListA, n=3000)
 	f = fftfreq(len(F),dt)
@@ -77,7 +77,7 @@ def fft_filter_find_fundamentals(ListA, dt, n):
 	f = fftfreq(len(F),dt)
 	m = 0; a=0
 	for j in range(n):
-		m = filter(lambda x: x!=0 and x>m, f)
+		m = filter(lambda x: x==0 or x>m, f)
 		for i in range(len(m)):
 			m[i] = abs(m[i])
 		m = min(m)
