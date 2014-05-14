@@ -183,9 +183,10 @@ def main():
         fourier_filter.show_fig(spectral_subtraction(WEP, WEP2, 0.05), 0.05, 0)
 	fourier_filter.show_fig(ifft(WEP.M), 0.05, 0)	
 	fourier_filter.show_fig(ifft(WEP2.M), 0.05, 0)		
- 	K = [0]*len(ifft(WEP.M))
-	for i in range(len(ifft(WEP.M))):
-		K[i] = abs(ifft(WEP.M)[i]) - abs(ifft(WEP2.M)[i])
+ 	K = [0]*len(WEP.M)
+	for i in range(len(WEP.M)):
+		K[i] = abs(WEP.M[i]) - abs(WEP2.M[i])
+	K = ifft(K)
 	fourier_filter.show_fig(K, 0.05, 0)
 	K = fourier_filter.fft_filter_find_fundamentals(K, 0.05, 120)
 	fourier_filter.show_fig(K, 0.05, 0)
