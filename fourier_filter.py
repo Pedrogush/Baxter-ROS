@@ -49,10 +49,10 @@ def return_average(args):
 
 # accept a band centered around 0 in the transform
 def fft_filter(ListA, dt, band):
-	F = rfft(ListA, n=3000)
+	F = rfft(ListA)
 	f = fftfreq(len(F),dt)
 	F_filtered = array([filter_rule(x,freq, band) for x,freq in zip(F,f)])
-	print F_filtered
+	F_filtered = irfft(F_filtered)
 	return F_filtered
 def filter_phase(ListA, dt, band):
 	F = rfft(ListA, n=3000)
