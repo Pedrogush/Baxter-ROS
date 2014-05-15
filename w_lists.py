@@ -137,13 +137,13 @@ class weight_eval_p(object):
 		#	sum_of_Ef[i] = fourier_filter.moving_average(sum_of_Ef[i], 1000,0.01, i)
 			fourier_filter.show_fig(self.sum_of_Ef[i], a, i)
 			fourier_filter.show_power_spectrum(self.sum_of_Ef[i], a, i)
+			self.show_mean_max_min_and_range(i)
 
-	def show_mean_max_min_and_range(self):	
+	def show_mean_max_min_and_range(self, i):	
 		print sum(self.sum_of_Ef[i])/len(self.sum_of_Ef[i])
-		self.sum_of_Ef[i] = fourier_filter.fft_filter_band_reject(self.sum_of_Ef[i], 0.05, 0)
 		print max(self.sum_of_Ef[i])
 		print min(self.sum_of_Ef[i])
-		print (max(self.sum_of_Ef[i]) - min(self.sum_of_Ef[i]))/2
+		print (max(self.sum_of_Ef[i]) - min(self.sum_of_Ef[i]))
 
 def spectral_subtraction(WEP1, WEP2, dt):
 	WEP1.get_sum_of_torque_values_no_phase()
